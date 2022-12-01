@@ -1,0 +1,33 @@
+cabal-version:       2.2
+
+name:                adventofcode
+version:             2022
+synopsis:            Advent of code 2022 solutions
+description:         Advent of code 2022 solutions in Haskell by Erik Hesselink
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Erik Hesselink
+maintainer:          hesselink@gmail.com
+category:            Advent of Code
+build-type:          Simple
+
+Source-Repository head
+  Type:                git
+  Location:            git://github.com/hesselink/adventofcode2022.git
+
+common shared-settings
+  build-depends:       base >=4.9 && <4.17
+  ghc-options:         -Wall
+  default-language:    Haskell2010
+
+library
+  import:              shared-settings
+  hs-source-dirs:      lib
+  exposed-modules:     Lib
+  build-depends:       containers
+
+executable 1
+  import:              shared-settings
+  main-is:             Main.hs
+  hs-source-dirs:      1
+  build-depends:       split
