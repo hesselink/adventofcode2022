@@ -31,3 +31,8 @@ executable 1
   main-is:             Main.hs
   hs-source-dirs:      1
   build-depends:       split
+
+executable 2
+  import:              shared-settings
+  main-is:             Main.hs
+  hs-source-dirs:      2
