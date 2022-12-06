@@ -16,6 +16,8 @@ main = do
   let initialState = parse f
       result = getMessage (execute initialState)
   putStrLn result
+  let result2 = getMessage (execute2 initialState)
+  putStrLn result2
 
 type Stack a = [a]
 
@@ -55,28 +57,59 @@ parseProcedure :: [String] -> [Step]
 parseProcedure = map (runParser parseStep)
 
 parseStep :: Parser Step
-parseStep = Step <$ P.string "move " <*> parseNumber <* P.string " from " <*> parseNumber <* P.string " to " <*> parseNumber
+parseStep
+  = Step
+  <$  P.string "move "
+  <*> parseNumber
+  <*  P.string " from "
+  <*> parseNumber
+  <*  P.string " to "
+  <*> parseNumber
 
 execute :: State -> State
-execute currentState =
-  if null (procedure currentState)
-  then currentState
-  else execute (step currentState)
+execute = executeWith step
+
+execute2 :: State -> State
+execute2 = executeWith step2
+
+executeWith :: (State -> State) -> State -> State
+executeWith step_ = go
+  where
+    go currentState =
+      if null (procedure currentState)
+      then currentState
+      else go (step_ currentState)
 
 step :: State -> State
-step st =
+step = stepWith doMove
+
+step2 :: State -> State
+step2 = stepWith doMove2
+
+stepWith :: (Step -> IntMap (Stack Char) -> IntMap (Stack Char)) -> State -> State
+stepWith doMove_ st =
   case procedure st of
     [] -> st
     (p:ps) -> State
-      { stacks = doMove p (stacks st)
+      { stacks = doMove_ p (stacks st)
       , procedure = ps
       }
 
 doMove :: Step -> IntMap (Stack Char) -> IntMap (Stack Char)
-doMove st stacks =
+doMove = doMoveWith popMany
+
+doMove2 :: Step -> IntMap (Stack Char) -> IntMap (Stack Char)
+doMove2 = doMoveWith popMany2
+
+doMoveWith
+  :: (Int -> Stack Char -> ([Char], Stack Char))
+  -> Step
+  -> IntMap (Stack Char)
+  -> IntMap (Stack Char)
+doMoveWith popMany_ st stacks =
   let fromStack = fromJustNote "stack not found" $ M.lookup (from st) stacks
       toStack = fromJustNote "stack not found" $ M.lookup (to st) stacks
-      (items, newFromStack) = popMany (amount st) fromStack
+      (items, newFromStack) = popMany_ (amount st) fromStack
       newToStack = pushMany items toStack
   in M.insert (from st) newFromStack (M.insert (to st) newToStack stacks)
 
@@ -87,6 +120,9 @@ popMany :: Int -> Stack a -> ([a], Stack a)
 popMany n st =
   let (is, st') = splitAt n st
   in (reverse is, st')
+
+popMany2 :: Int -> Stack a -> ([a], Stack a)
+popMany2 n st = splitAt n st
 
 pushMany :: [a] -> Stack a -> Stack a
 pushMany = (++)
