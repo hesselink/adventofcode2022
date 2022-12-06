@@ -1,9 +1,9 @@
 module Main where
 
 import Control.Applicative
-import Data.Void
-import qualified Text.Megaparsec as P
 import qualified Text.Megaparsec.Char as P
+
+import Lib.Parser
 
 main :: IO ()
 main = do
@@ -38,11 +38,6 @@ overlapping r1 r2 = overlapping1 r1 r2 || overlapping1 r2 r1
 overlapping1 :: Range -> Range -> Bool
 overlapping1 (Range l1 r1) (Range l2 _r2) = l1 <= l2 && r1 >= l2
 
-runParser :: Parser a -> String -> a
-runParser p = either (error . P.errorBundlePretty) id . P.runParser p "input"
-
-type Parser = P.Parsec Void String
-
 parseRangePairs :: Parser [(Range, Range)]
 parseRangePairs = many (parseRangePair <* P.newline)
 
@@ -51,6 +46,3 @@ parseRangePair = (,) <$> parseRange <* P.char ',' <*> parseRange
 
 parseRange :: Parser Range
 parseRange = Range <$> parseNumber <* P.char '-' <*> parseNumber
-
-parseNumber :: Parser Int
-parseNumber = read <$> many P.numberChar

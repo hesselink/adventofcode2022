@@ -23,8 +23,9 @@ common shared-settings
 library
   import:              shared-settings
   hs-source-dirs:      lib
-  exposed-modules:     Lib
+  exposed-modules:     Lib.Parser
   build-depends:       containers
+                     , megaparsec
 
 executable 1
   import:              shared-settings
@@ -47,4 +48,5 @@ executable 4
   import:              shared-settings
   main-is:             Main.hs
   hs-source-dirs:      4
-  build-depends:       megaparsec
+  build-depends:       adventofcode
+                     , megaparsec
