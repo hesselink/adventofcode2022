@@ -50,3 +50,13 @@ executable 4
   hs-source-dirs:      4
   build-depends:       adventofcode
                      , megaparsec
+
+executable 5
+  import:              shared-settings
+  main-is:             Main.hs
+  hs-source-dirs:      5
+  build-depends:       adventofcode
+                     , containers
+                     , megaparsec
+                     , safe
+                     , split
