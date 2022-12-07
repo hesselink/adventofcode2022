@@ -10,5 +10,5 @@ type Parser = P.Parsec Void String
 runParser :: Parser a -> String -> a
 runParser p = either (error . P.errorBundlePretty) id . P.runParser p "input"
 
-parseNumber :: Parser Int
+parseNumber :: (Read a, Num a) => Parser a
 parseNumber = read <$> many P.numberChar

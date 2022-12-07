@@ -65,3 +65,11 @@ executable 6
   import:              shared-settings
   main-is:             Main.hs
   hs-source-dirs:      6
+
+executable 7
+  import:              shared-settings
+  main-is:             Main.hs
+  hs-source-dirs:      7
+  build-depends:       adventofcode
+                     , megaparsec
+                     , safe
