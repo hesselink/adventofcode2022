@@ -4,15 +4,15 @@ module Main where
 main :: IO ()
 main = do
   f <- readFile "input/6"
-  let result = detectStart f
+  let result = detectStart 4 f
   print result
+  let result2 = detectStart 14 f
+  print result2
 
-detectStart :: String -> Int
-detectStart = go 0
+detectStart :: Int -> String -> Int
+detectStart len = go 0
   where
-    go n = \case
-      (a:b:c:d:rs) -> if distinct [a,b,c,d] then (n+4) else go (n+1) (b:c:d:rs)
-      _ -> error "no start found"
+    go n str = if distinct (take len str) then n + len else go (n+1) (tail str)
 
 distinct :: (Show a, Eq a) => [a] -> Bool
 distinct [] = True
