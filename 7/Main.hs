@@ -3,6 +3,7 @@ module Main where
 import Control.Applicative
 import Data.List
 import Data.Maybe
+import Data.Semigroup
 import Safe
 import qualified Text.Megaparsec.Char as P
 
@@ -15,6 +16,8 @@ main = do
       fs = buildFs output
       result = sizeUpTo100k fs
   print result
+  let result2 = findSmallestDirSizeToDelete fs
+  print result2
 
 -- ** Terminal output
 
@@ -172,10 +175,23 @@ fold :: (Integer -> String -> a) -> (String -> [a] -> a) -> FsNode -> a
 fold fFile _ (FsFile sz nm) = fFile sz nm
 fold fFile fDir (FsDir nm cs) = fDir nm (map (fold fFile fDir) cs)
 
+size :: FsNode -> Integer
+size = fold const (const sum)
+
 sizeUpTo100k :: FsNode -> Integer
 sizeUpTo100k = snd .
   fold
     (\sz _ -> (sz, 0))
     (\_ szs -> let mySize = sum (map fst szs)
-               in (mySize, (if mySize > 100000 then 0 else mySize) + sum (map snd szs))
+               in (mySize, (if mySize > 100_000 then 0 else mySize) + sum (map snd szs))
     )
+
+findSmallestDirSizeToDelete :: FsNode -> Integer
+findSmallestDirSizeToDelete fs =
+  let neededSpace = size fs - 40_000_000
+  in fromJustNote "no suitable dir found" . snd $ fold
+       (\sz _ -> (sz, Nothing))
+       (\_ szs -> let curMin = foldMap (fmap Min . snd) ((mySize, if mySize >= neededSpace then Just mySize else Nothing) : szs)
+                      mySize = sum (map fst szs)
+                  in (mySize, getMin <$> curMin)
+       ) fs
